@@ -46,7 +46,7 @@ if (args[0] === 'init') {
 
   app.post('/api/download', async (req, res) => {
     try {
-      const { icon_id } = req.body;
+      const { icon_id, customizations } = req.body;
       if (!icon_id) {
         return res.status(400).json({ error: 'icon_id is required' });
       }
@@ -68,7 +68,7 @@ if (args[0] === 'init') {
       const iconName = `${baseName}Icon`;
       const fileName = `${iconName}.tsx`;
 
-      const componentCode = generateReactIcon(iconName, svgContent);
+      const componentCode = generateReactIcon(iconName, svgContent, customizations || {});
 
       if (!fs.existsSync(savePath)) {
         fs.mkdirSync(savePath, { recursive: true });

@@ -11,6 +11,7 @@
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --accent: #3b82f6;
+      --accent-hover: #2563eb;
     }
     body {
       background: var(--bg-color);
@@ -23,33 +24,104 @@
     .header {
       position: sticky;
       top: 0;
-      background: rgba(15, 23, 42, 0.8);
+      background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--glass-border);
       padding: 1rem 2rem;
-      z-index: 10;
+      z-index: 20;
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 1.5rem;
+    }
+    .logo {
+      font-weight: 800;
+      font-size: 1.25rem;
+      background: linear-gradient(to right, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+    }
+    .search-wrapper {
+      flex: 1;
+      position: relative;
+      max-width: 600px;
     }
     input[type="text"] {
-      flex: 1;
-      padding: 0.75rem 1rem;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
       border-radius: 8px;
       border: 1px solid var(--glass-border);
       background: rgba(0,0,0,0.2);
       color: white;
       font-size: 1rem;
       outline: none;
+      transition: border-color 0.2s;
     }
     input[type="text"]:focus {
       border-color: var(--accent);
     }
+    .search-icon {
+      position: absolute;
+      left: 0.8rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 4rem 2rem 2rem;
+    }
+    .hero h1 {
+      font-size: 2.5rem;
+      margin: 0 0 1rem;
+      letter-spacing: -0.025em;
+    }
+    .hero p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Categories / Chips */
+    .categories {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 1rem 2rem 2rem;
+      flex-wrap: wrap;
+    }
+    .chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      padding: 0.5rem 1rem;
+      border-radius: 99px;
+      color: var(--text-main);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    .chip:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    /* Grid */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 1.5rem;
-      padding: 2rem;
+      padding: 0 2rem 4rem;
+      max-width: 1400px;
+      margin: 0 auto;
     }
     .card {
       background: var(--card-bg);
@@ -59,36 +131,55 @@
       text-align: center;
       position: relative;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: transform 0.2s, border-color 0.2s;
+      overflow: hidden;
+      height: 146px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      box-sizing: border-box;
     }
     .card:hover {
-      transform: translateY(-2px);
+      transform: translateY(-4px);
       border-color: rgba(255, 255, 255, 0.3);
     }
     .icon-preview {
       font-size: 2.5rem;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 48px;
+      flex-shrink: 0;
     }
     .icon-name {
       font-size: 0.8rem;
       font-weight: 500;
-      word-break: break-all;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+      line-height: 1.4;
     }
     .icon-set {
       font-size: 0.7rem;
       color: var(--text-muted);
-      margin-top: 0.25rem;
+      margin-top: 0.2rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+      line-height: 1.4;
     }
     .add-btn {
       position: absolute;
       inset: 0;
-      background: rgba(15, 23, 42, 0.9);
-      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.95);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       opacity: 0;
@@ -97,10 +188,22 @@
       color: white;
       font-weight: 600;
       cursor: pointer;
+      gap: 0.5rem;
     }
     .card:hover .add-btn {
       opacity: 1;
     }
+    .add-btn-icon {
+      background: var(--accent);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
     #toast {
       position: fixed;
       bottom: 2rem;
@@ -109,11 +212,15 @@
       color: white;
       padding: 1rem 1.5rem;
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
       transform: translateY(100px);
       opacity: 0;
-      transition: all 0.3s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 100;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
     #toast.show {
       transform: translateY(0);
@@ -122,60 +229,372 @@
     .loader {
       display: none;
       text-align: center;
-      padding: 2rem;
+      padding: 3rem;
       color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+      grid-column: 1 / -1;
+    }
+
+    /* Skeleton Loader */
+    .skeleton-card {
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 146px;
+      box-sizing: border-box;
+    }
+    
+    .skeleton-icon, .skeleton-text, .skeleton-text-small {
+      background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite linear;
+      border-radius: 4px;
+    }
+
+    .skeleton-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .skeleton-text {
+      width: 80%;
+      height: 12px;
+      margin-bottom: 0.5rem;
+    }
+
+    .skeleton-text-small {
+      width: 50%;
+      height: 10px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Modal Styles */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 50;
+    }
+    .modal-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-content {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateY(20px);
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .modal-backdrop.show .modal-content {
+      transform: translateY(0);
+    }
+    .modal-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .close-btn:hover {
+      color: white;
+    }
+    .modal-body {
+      padding: 2rem;
+      display: flex;
+      gap: 2.5rem;
+      align-items: stretch;
+    }
+    .modal-preview {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      min-height: 200px;
+      color: white; /* Base color for current color */
+    }
+    .modal-preview svg {
+      transition: all 0.2s ease;
+    }
+    .modal-controls {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      justify-content: center;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .control-group label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .control-group input[type="number"],
+    .control-group input[type="text"] {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
+      color: white;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+    }
+    .control-group input[type="number"]:focus,
+    .control-group input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+    .control-group input[type="color"] {
+      -webkit-appearance: none;
+      border: 1px solid var(--glass-border);
+      width: 100%;
+      height: 42px;
+      border-radius: 8px;
+      padding: 0;
+      background: none;
+      cursor: pointer;
+    }
+    .control-group input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 2px;
+    }
+    .control-group input[type="color"]::-webkit-color-swatch {
+      border: none;
+      border-radius: 6px;
+    }
+    .modal-footer {
+      padding: 1.5rem;
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      background: rgba(0,0,0,0.2);
+    }
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid var(--glass-border);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    .btn-cancel:hover {
+      background: rgba(255,255,255,0.05);
+    }
+    .btn-primary {
+      background: var(--accent);
+      border: none;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <div style="font-weight: bold; font-size: 1.25rem; margin-right: 1rem;">icon-vista</div>
-    <input type="text" id="searchInput" placeholder="Search icons (e.g., shopping cart, user)...">
+    <div class="logo">icon-vista</div>
+    <div class="search-wrapper">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input type="text" id="searchInput" placeholder="Search for icons (e.g., home, user, cart)...">
+    </div>
+  </div>
+
+  <div class="hero" id="heroSection">
+    <h1>Beautiful icons, instantly typed.</h1>
+    <p>Search across 200,000+ open-source icons. Click any icon to instantly generate a strictly-typed React component in your codebase.</p>
+  </div>
+
+  <div class="categories" id="categoriesSection">
+    <button class="chip" onclick="setSearch('home')">🏠 Home</button>
+    <button class="chip" onclick="setSearch('user')">👤 Users</button>
+    <button class="chip" onclick="setSearch('settings')">⚙️ Settings</button>
+    <button class="chip" onclick="setSearch('social')">💬 Social</button>
+    <button class="chip" onclick="setSearch('weather')">🌤️ Weather</button>
+    <button class="chip" onclick="setSearch('cart')">🛍️ E-commerce</button>
   </div>
   
-  <div class="loader" id="loader">Searching...</div>
   <div class="grid" id="grid"></div>
-  <div id="toast">Icon saved to codebase!</div>
+  
+  <div id="toast">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+    <span>Icon saved to codebase!</span>
+  </div>
+
+  <!-- Customization Modal -->
+  <div class="modal-backdrop" id="customizeModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Customize Icon</h2>
+        <button class="close-btn" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-preview" id="modalPreview">
+          <!-- SVG will be injected here -->
+        </div>
+        <div class="modal-controls">
+          <div class="control-group">
+            <label>Size (px)</label>
+            <input type="number" id="sizeInput" value="24" min="8" max="256">
+          </div>
+          <div class="control-group">
+            <label>Default Color</label>
+            <input type="color" id="colorInput" value="#ffffff">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-primary" id="saveComponentBtn">Add to Project</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     const searchInput = document.getElementById('searchInput');
     const grid = document.getElementById('grid');
-    const loader = document.getElementById('loader');
     const toast = document.getElementById('toast');
     let debounceTimer;
+
+    // Modal state
+    const customizeModal = document.getElementById('customizeModal');
+    const modalPreview = document.getElementById('modalPreview');
+    const sizeInput = document.getElementById('sizeInput');
+    const colorInput = document.getElementById('colorInput');
+    let currentIconId = null;
+    let currentPrefix = null;
+    let currentName = null;
+
+    // Curated themes for random inspiration
+    const curatedThemes = [
+      'dashboard', 'home', 'user', 'heart', 'star', 'music', 
+      'camera', 'mail', 'rocket', 'code', 'coffee', 'cloud', 
+      'shield', 'game', 'compass', 'leaf', 'book', 'zap'
+    ];
+
+    function showSkeletons() {
+      grid.innerHTML = '';
+      // Create 24 skeleton cards to fill the screen
+      for (let i = 0; i < 24; i++) {
+        const skeleton = document.createElement('div');
+        skeleton.className = 'skeleton-card';
+        skeleton.innerHTML = `
+          <div class="skeleton-icon"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text-small"></div>
+        `;
+        grid.appendChild(skeleton);
+      }
+    }
+
+    function loadRandomTheme() {
+      const randomTheme = curatedThemes[Math.floor(Math.random() * curatedThemes.length)];
+      searchInput.placeholder = `Search for icons... (Currently showing '${randomTheme}' inspiration)`;
+      searchIcons(randomTheme);
+    }
+
+    // Load default icons when page opens
+    window.addEventListener('DOMContentLoaded', () => {
+      loadRandomTheme();
+    });
 
     searchInput.addEventListener('input', (e) => {
       clearTimeout(debounceTimer);
       const query = e.target.value.trim();
       if (!query) {
-        grid.innerHTML = '';
+        // Revert to a new random default if search is cleared
+        loadRandomTheme();
         return;
       }
       
+      // Update placeholder to normal state when typing
+      searchInput.placeholder = 'Search for icons (e.g., home, user, cart)...';
+      
       debounceTimer = setTimeout(() => {
         searchIcons(query);
-      }, 500);
+      }, 400);
     });
 
+    function setSearch(query) {
+      searchInput.value = query;
+      searchIcons(query);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     async function searchIcons(query) {
-      loader.style.display = 'block';
-      grid.innerHTML = '';
+      showSkeletons();
+      
       try {
         const res = await fetch(`https://api.iconify.design/search?query=${encodeURIComponent(query)}&limit=100`);
         const data = await res.json();
         
-        loader.style.display = 'none';
+        grid.innerHTML = ''; // Clear skeletons
+        
         if (data.icons && data.icons.length > 0) {
           data.icons.forEach(iconId => {
             const [prefix, name] = iconId.split(':');
             createCard(iconId, prefix, name);
           });
         } else {
-          grid.innerHTML = '<div style="padding: 2rem; color: #94a3b8;">No icons found.</div>';
+          grid.innerHTML = '<div class="empty-state"><h3>No icons found</h3><p>Try searching for something else like "user" or "settings".</p></div>';
         }
       } catch (err) {
-        loader.style.display = 'none';
-        grid.innerHTML = `<div style="padding: 2rem; color: #ef4444;">Error searching icons: ${err.message}</div>`;
+        grid.innerHTML = `<div class="empty-state" style="color: #ef4444;"><h3>Error</h3><p>${err.message}</p></div>`;
       }
     }
 
@@ -190,17 +609,22 @@
       const nameEl = document.createElement('div');
       nameEl.className = 'icon-name';
       nameEl.textContent = name;
+      nameEl.title = name;
 
       const setEl = document.createElement('div');
       setEl.className = 'icon-set';
       setEl.textContent = prefix;
+      setEl.title = prefix;
 
       const btn = document.createElement('button');
       btn.className = 'add-btn';
-      btn.textContent = 'Add to Project';
+      btn.innerHTML = `
+        <div class="add-btn-icon">+</div>
+        <div>Customize</div>
+      `;
       btn.onclick = (e) => {
         e.stopPropagation();
-        downloadIcon(iconId);
+        openModal(iconId, prefix, name);
       };
 
       card.appendChild(preview);
@@ -210,27 +634,82 @@
       grid.appendChild(card);
     }
 
-    async function downloadIcon(iconId) {
+    async function openModal(iconId, prefix, name) {
+      currentIconId = iconId;
+      currentPrefix = prefix;
+      currentName = name;
+      document.getElementById('modalTitle').textContent = `Customize ${name}`;
+      
+      // Reset inputs
+      sizeInput.value = '24';
+      colorInput.value = '#ffffff';
+
+      // Show modal in loading state
+      customizeModal.classList.add('show');
+      modalPreview.innerHTML = '<div style="color: var(--text-muted)">Loading SVG...</div>';
+
+      try {
+        const res = await fetch(`https://api.iconify.design/${prefix}/${name}.svg`);
+        const svgText = await res.text();
+        modalPreview.innerHTML = svgText;
+        updatePreview();
+      } catch (err) {
+        modalPreview.innerHTML = `<div style="color: #ef4444">Failed to load SVG</div>`;
+      }
+    }
+
+    function closeModal() {
+      customizeModal.classList.remove('show');
+    }
+
+    function updatePreview() {
+      const svg = modalPreview.querySelector('svg');
+      if (!svg) return;
+      
+      const size = sizeInput.value || 24;
+      svg.setAttribute('width', size);
+      svg.setAttribute('height', size);
+      
+      // Update color. Iconify usually uses currentColor, so we just set the color of the parent container
+      modalPreview.style.color = colorInput.value;
+    }
+
+    sizeInput.addEventListener('input', updatePreview);
+    colorInput.addEventListener('input', updatePreview);
+
+    document.getElementById('saveComponentBtn').addEventListener('click', async () => {
+      const customizations = {
+        size: Number(sizeInput.value),
+        color: colorInput.value
+      };
+      
+      const originalText = document.getElementById('saveComponentBtn').textContent;
+      document.getElementById('saveComponentBtn').textContent = 'Saving...';
+      
       try {
         const res = await fetch('/api/download', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ icon_id: iconId })
+          body: JSON.stringify({ icon_id: currentIconId, customizations })
         });
         const data = await res.json();
         
         if (data.success) {
-          showToast(`Icon saved to codebase!`);
+          closeModal();
+          showToast(`Saved <br/> <small style="opacity:0.8">${data.fileName}</small>`);
         } else {
           alert('Error: ' + data.error);
         }
       } catch (err) {
         alert('Network error: ' + err.message);
+      } finally {
+        document.getElementById('saveComponentBtn').textContent = originalText;
       }
-    }
+    });
 
     function showToast(msg) {
-      toast.textContent = msg;
+      const toastSpan = toast.querySelector('span');
+      toastSpan.innerHTML = msg;
       toast.classList.add('show');
       setTimeout(() => {
         toast.classList.remove('show');
