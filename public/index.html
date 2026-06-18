@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>icon-vista</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6;
+    }
+    body {
+      background: var(--bg-color);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .header {
+      position: sticky;
+      top: 0;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 1rem 2rem;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--glass-border);
+      background: rgba(0,0,0,0.2);
+      color: white;
+      font-size: 1rem;
+      outline: none;
+    }
+    input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .icon-preview {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 48px;
+    }
+    .icon-name {
+      font-size: 0.8rem;
+      font-weight: 500;
+      word-break: break-all;
+    }
+    .icon-set {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    .add-btn {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+      border: none;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .card:hover .add-btn {
+      opacity: 1;
+    }
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #10b981;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 100;
+    }
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .loader {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div style="font-weight: bold; font-size: 1.25rem; margin-right: 1rem;">icon-vista</div>
+    <input type="text" id="searchInput" placeholder="Search icons (e.g., shopping cart, user)...">
+  </div>
+  
+  <div class="loader" id="loader">Searching...</div>
+  <div class="grid" id="grid"></div>
+  <div id="toast">Icon saved to codebase!</div>
+
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const grid = document.getElementById('grid');
+    const loader = document.getElementById('loader');
+    const toast = document.getElementById('toast');
+    let debounceTimer;
+
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(debounceTimer);
+      const query = e.target.value.trim();
+      if (!query) {
+        grid.innerHTML = '';
+        return;
+      }
+      
+      debounceTimer = setTimeout(() => {
+        searchIcons(query);
+      }, 500);
+    });
+
+    async function searchIcons(query) {
+      loader.style.display = 'block';
+      grid.innerHTML = '';
+      try {
+        const res = await fetch(`https://api.iconify.design/search?query=${encodeURIComponent(query)}&limit=100`);
+        const data = await res.json();
+        
+        loader.style.display = 'none';
+        if (data.icons && data.icons.length > 0) {
+          data.icons.forEach(iconId => {
+            const [prefix, name] = iconId.split(':');
+            createCard(iconId, prefix, name);
+          });
+        } else {
+          grid.innerHTML = '<div style="padding: 2rem; color: #94a3b8;">No icons found.</div>';
+        }
+      } catch (err) {
+        loader.style.display = 'none';
+        grid.innerHTML = `<div style="padding: 2rem; color: #ef4444;">Error searching icons: ${err.message}</div>`;
+      }
+    }
+
+    function createCard(iconId, prefix, name) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      
+      const preview = document.createElement('div');
+      preview.className = 'icon-preview';
+      preview.innerHTML = `<img src="https://api.iconify.design/${prefix}/${name}.svg?color=white" alt="${name}" style="width: 2.5rem; height: 2.5rem;" />`;
+
+      const nameEl = document.createElement('div');
+      nameEl.className = 'icon-name';
+      nameEl.textContent = name;
+
+      const setEl = document.createElement('div');
+      setEl.className = 'icon-set';
+      setEl.textContent = prefix;
+
+      const btn = document.createElement('button');
+      btn.className = 'add-btn';
+      btn.textContent = 'Add to Project';
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        downloadIcon(iconId);
+      };
+
+      card.appendChild(preview);
+      card.appendChild(nameEl);
+      card.appendChild(setEl);
+      card.appendChild(btn);
+      grid.appendChild(card);
+    }
+
+    async function downloadIcon(iconId) {
+      try {
+        const res = await fetch('/api/download', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ icon_id: iconId })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          showToast(`Icon saved to codebase!`);
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      }
+    }
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "icon-vista",
+  "version": "1.0.0",
+  "description": "CLI tool to download and generate React icons from Iconify",
+  "type": "module",
+  "bin": {
+    "icon-vista": "./bin/cli.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
