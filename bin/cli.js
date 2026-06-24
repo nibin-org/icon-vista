@@ -6,6 +6,7 @@ import readline from 'readline';
 import express from 'express';
 import { exec } from 'child_process';
 import { generateReactIcon } from '../templates/react-icon.js';
+import { getProvider } from './providers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,10 +25,14 @@ if (args[0] === 'init') {
 
   rl.question('Where would you like to save your icons? (default: ./src/components/icons) ', (answer) => {
     const savePath = answer.trim() || './src/components/icons';
-    fs.writeFileSync(CONFIG_FILE, JSON.stringify({ savePath }, null, 2));
-    console.log(`\n✅ Configuration saved to icon-vista.json`);
-    console.log(`Icons will be saved to: ${savePath}\n`);
-    rl.close();
+    rl.question('Which icon provider do you want to use? [iconify | untitled-ui] (default: iconify) ', (answer2) => {
+      const provider = answer2.trim() || 'iconify';
+      fs.writeFileSync(CONFIG_FILE, JSON.stringify({ savePath, provider }, null, 2));
+      console.log(`\n✅ Configuration saved to icon-vista.json`);
+      console.log(`Icons will be saved to: ${savePath}`);
+      console.log(`Using provider: ${provider}\n`);
+      rl.close();
+    });
   });
 } else {
   if (!fs.existsSync(CONFIG_FILE)) {
@@ -37,6 +42,14 @@ if (args[0] === 'init') {
 
   const config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8'));
   const savePath = path.resolve(cwd, config.savePath);
+  const providerName = config.provider || 'iconify';
+
+  let activeProvider;
+  try {
+    activeProvider = await getProvider(providerName);
+  } catch (err) {
+    process.exit(1);
+  }
 
   const app = express();
   app.use(express.json());
@@ -49,13 +62,11 @@ if (args[0] === 'init') {
 
     const [prefix, name] = icon_id.split(':');
     
-    const response = await fetch(`https://api.iconify.design/${prefix}/${name}.svg`);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch icon: ${response.statusText}`);
+    const svgContent = await activeProvider.getSvg(icon_id);
+    if (!svgContent) {
+      throw new Error(`Failed to fetch icon: ${icon_id} not found.`);
     }
 
-    const svgContent = await response.text();
-    
     const baseName = name.replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase())
                         .replace(/^([a-z])/, (m, chr) => chr.toUpperCase());
     const iconName = `${baseName}Icon`;
@@ -96,6 +107,38 @@ if (args[0] === 'init') {
       console.error(err);
       res.status(500).json({ error: err.message });
     }
+  });
+
+  app.get('/api/search', async (req, res) => {
+    try {
+      const q = req.query.query || '';
+      const limit = parseInt(req.query.limit) || 100;
+      const icons = await activeProvider.search(q, limit);
+      res.json({ icons });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/api/svg', async (req, res) => {
+    try {
+      const id = req.query.id;
+      let svg = await activeProvider.getSvg(id);
+      if (!svg) return res.status(404).send('Not found');
+      
+      if (req.query.color) {
+        svg = svg.replace(/currentColor/gi, req.query.color);
+      }
+      
+      res.setHeader('Content-Type', 'image/svg+xml');
+      res.send(svg);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
+  });
+
+  app.get('/api/config', (req, res) => {
+    res.json({ provider: activeProvider.name });
   });
 
   function startServer(port) {

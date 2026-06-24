@@ -973,10 +973,9 @@
     }
 
     async function searchIcons(query) {
-      showSkeletons();
-      
+      grid.innerHTML = '<div class="loading">Searching icons...</div>';
       try {
-        const res = await fetch(`https://api.iconify.design/search?query=${encodeURIComponent(query)}&limit=100`);
+        const res = await fetch(`/api/search?query=${encodeURIComponent(query)}&limit=100`);
         const data = await res.json();
         
         grid.innerHTML = ''; // Clear skeletons
@@ -1000,7 +999,7 @@
       
       const preview = document.createElement('div');
       preview.className = 'icon-preview';
-      preview.innerHTML = `<img src="https://api.iconify.design/${prefix}/${name}.svg?color=white" alt="${name}" style="width: 2.5rem; height: 2.5rem;" />`;
+      preview.innerHTML = `<img src="/api/svg?id=${iconId}&color=white" alt="${name}" style="width: 2.5rem; height: 2.5rem;" />`;
 
       const nameEl = document.createElement('div');
       nameEl.className = 'icon-name';
@@ -1108,16 +1107,17 @@
       setActiveSizePreset(24);
 
       // Identity bar
-      document.getElementById('modalIdName').textContent = name;
-      document.getElementById('modalIdSet').textContent  = prefix;
-      document.getElementById('modalThumbImg').src = `https://api.iconify.design/${prefix}/${name}.svg?color=white`;
+      document.getElementById('modalTitle').textContent = name;
+      document.getElementById('modalSubtitle').textContent = prefix;
+      document.getElementById('modalThumbImg').src = `/api/svg?id=${iconId}&color=white`;
 
       // Show modal
       customizeModal.classList.add('show');
       modalPreview.innerHTML = '<div style="color:var(--text-muted);font-size:0.85rem">Loading…</div>';
 
+      // Fetch high-res SVG for preview
       try {
-        const res     = await fetch(`https://api.iconify.design/${prefix}/${name}.svg`);
+        const res     = await fetch(`/api/svg?id=${iconId}`);
         const svgText = await res.text();
         modalPreview.innerHTML = svgText;
         updatePreview();
@@ -1222,6 +1222,25 @@
       } catch (err) {
         showToast('<span style="color:#f87171">Failed to copy</span>');
       }
+    });
+
+    // ── Initial load ────────────────────────────────────────
+    let currentProvider = 'iconify';
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const configRes = await fetch('/api/config');
+        const config = await configRes.json();
+        currentProvider = config.provider;
+
+        if (currentProvider === 'untitled-ui') {
+          document.querySelector('.hero h1').textContent = 'Premium icons, instantly typed.';
+          document.querySelector('.hero p').textContent = 'Search your private Untitled UI Pro library. Click any icon to instantly generate a strictly-typed React component.';
+          document.querySelector('.logo').textContent = 'Untitled UI';
+        }
+      } catch(e) {}
+      
+      searchIcons('home');
     });
 
     // ── Size slider ───────────────────────────────────────

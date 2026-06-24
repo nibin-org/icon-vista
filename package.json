@@ -1,11 +1,25 @@
 {
   "name": "icon-vista",
   "version": "1.0.0",
-  "description": "CLI tool to download and generate React icons from Iconify",
+  "description": "A beautiful local CLI tool to search, generate, and strictly type React icons from Iconify or Untitled UI Pro.",
+  "keywords": [
+    "react",
+    "icons",
+    "cli",
+    "iconify",
+    "untitled-ui",
+    "svg",
+    "generator"
+  ],
   "type": "module",
   "bin": {
     "icon-vista": "./bin/cli.js"
   },
+  "files": [
+    "bin",
+    "public",
+    "templates"
+  ],
   "dependencies": {
     "express": "^4.19.2"
   }
