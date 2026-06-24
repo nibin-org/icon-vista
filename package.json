@@ -1,6 +1,6 @@
 {
   "name": "icon-vista",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A beautiful local CLI tool to search, generate, and strictly type React icons from Iconify or Untitled UI Pro.",
   "keywords": [
     "react",

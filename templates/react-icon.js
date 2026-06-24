@@ -5,6 +5,7 @@ export function generateReactIcon(iconName, svgContent, customizations = {}) {
   let reactSvg = svgContent
     .replace(/\s*\bwidth="[^"]*"/g, "")
     .replace(/\s*\bheight="[^"]*"/g, "")
+    .replace(/\s*\bcolor="[^"]*"/g, "")
     .replace(/stroke-width/g, "strokeWidth")
     .replace(/stroke-linecap/g, "strokeLinecap")
     .replace(/stroke-linejoin/g, "strokeLinejoin")
