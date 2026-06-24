@@ -661,11 +661,55 @@
       color: #93c5fd;
       white-space: pre;
       overflow-x: auto;
+      height: 260px;
+      min-height: 260px;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+    .modal-code code::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    .modal-code code::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.1);
+      border-radius: 4px;
+    }
+    .modal-code code::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
+    }
+    .modal-code code::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.25);
     }
     .modal-code code .kw  { color: #c4b5fd; }
     .modal-code code .prop { color: #6ee7b7; }
     .modal-code code .val  { color: #fca5a5; }
     .modal-code code .str  { color: #fde68a; }
+
+    .segmented-control {
+      display: flex;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      padding: 2px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .segment-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.3rem 0.6rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .segment-btn:hover { color: white; }
+    .segment-btn.active {
+      background: rgba(255,255,255,0.12);
+      color: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
 
     /* Footer */
     .modal-footer {
@@ -815,17 +859,45 @@
 
       <!-- Live code snippet -->
       <div class="modal-code">
-        <div class="modal-code-label">Component usage</div>
+        <div class="modal-code-label" style="display:flex; justify-content:space-between; align-items:center; padding-right:0.75rem;">
+          <div style="display:flex; gap:1rem; align-items:center;">
+            <span>Generated Component</span>
+            <div style="display:flex; gap:0.5rem;">
+              <div class="segmented-control">
+                <button class="segment-btn active" data-type="lang" data-val="ts">TS</button>
+                <button class="segment-btn" data-type="lang" data-val="js">JS</button>
+              </div>
+              <div class="segmented-control">
+                <button class="segment-btn active" data-type="style" data-val="standard">function()</button>
+                <button class="segment-btn" data-type="style" data-val="arrow">() =&gt;</button>
+              </div>
+            </div>
+          </div>
+          <button id="copyCodeBtn" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; padding:0; display:flex;" title="Copy to clipboard">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          </button>
+        </div>
         <code id="codeSnippet"></code>
       </div>
 
       <!-- Footer -->
-      <div class="modal-footer">
-        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-        <button class="btn-primary" id="saveComponentBtn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Add to Project
-        </button>
+      <div class="modal-footer" style="justify-content: space-between;">
+        <div style="display:flex; gap:0.5rem;">
+          <button class="btn-cancel" id="downloadSvgBtn" style="display:flex; align-items:center; gap:0.5rem; color: #94a3b8;" title="Download raw .svg file">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download SVG
+          </button>
+          <button class="btn-cancel" id="copySvgBtn" style="display:flex; align-items:center; justify-content:center; padding:0.65rem; color: #94a3b8;" title="Copy raw SVG code">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          </button>
+        </div>
+        <div style="display:flex; gap:0.75rem;">
+          <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+          <button class="btn-primary" id="saveComponentBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+            Add to Project
+          </button>
+        </div>
       </div>
 
     </div>
@@ -1018,6 +1090,9 @@
     const currentColorToggle = document.getElementById('currentColorToggle');
     const codeSnippet        = document.getElementById('codeSnippet');
 
+    let currentLang = 'ts';
+    let currentStyle = 'standard';
+
     // ── Open modal ────────────────────────────────────────
     async function openModal(iconId, prefix, name) {
       currentIconId = iconId;
@@ -1064,7 +1139,13 @@
 
     function applyColorToPreview() {
       if (isCurrentColor) {
-        modalPreview.style.color = 'currentColor';
+        if (activeBg === 'light') {
+          modalPreview.style.color = '#0f172a'; // dark slate
+        } else if (activeBg === 'blue') {
+          modalPreview.style.color = '#ffffff'; // white
+        } else {
+          modalPreview.style.color = 'currentColor'; // inherits from #0f172a body
+        }
       } else {
         modalPreview.style.color = colorHex.value;
       }
@@ -1089,22 +1170,59 @@
       updateCodeSnippet();
     }
 
-    function updateCodeSnippet() {
-      if (!currentName) return;
-      const baseName  = currentName
-        .replace(/[^a-zA-Z0-9]+(.)/g, (_, c) => c.toUpperCase())
-        .replace(/^([a-z])/, c => c.toUpperCase());
-      const iconComp  = `${baseName}Icon`;
-      const size      = sizeInput.value || 24;
-      const colorProp = isCurrentColor ? 'currentColor' : colorHex.value;
+    let currentSnippetString = '';
+    let snippetDebounceTimer;
 
-      codeSnippet.innerHTML =
-        `<span class="kw">&lt;</span>${iconComp}` +
-        ` <span class="prop">width</span>=<span class="val">{${size}}</span>` +
-        ` <span class="prop">height</span>=<span class="val">{${size}}</span>` +
-        ` <span class="prop">color</span>=<span class="str">"${colorProp}"</span>` +
-        ` <span class="kw">/&gt;</span>`;
+    function updateCodeSnippet() {
+      if (!currentIconId) return;
+
+      const customizations = {
+        size: Number(sizeInput.value),
+        color: isCurrentColor ? 'currentColor' : colorHex.value,
+        language: currentLang,
+        exportStyle: currentStyle
+      };
+
+      codeSnippet.innerHTML = '<span style="color:var(--text-muted)">Generating snippet...</span>';
+
+      clearTimeout(snippetDebounceTimer);
+      snippetDebounceTimer = setTimeout(async () => {
+        try {
+          const res = await fetch('/api/generate-snippet', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ icon_id: currentIconId, customizations })
+          });
+          const data = await res.json();
+          if (data.success) {
+            currentSnippetString = data.code;
+            // Basic syntax highlighting
+            const escapedCode = data.code
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/([a-zA-Z0-9]+)=/g, '<span class="prop">$1</span>=')
+              .replace(/"([^"]*)"/g, '<span class="str">"$1"</span>')
+              .replace(/{([^}]*)}/g, '<span class="val">{$1}</span>');
+            
+            codeSnippet.innerHTML = escapedCode;
+          } else {
+            codeSnippet.innerHTML = `<span style="color:#ef4444">Error: ${data.error}</span>`;
+          }
+        } catch (err) {
+          codeSnippet.innerHTML = `<span style="color:#ef4444">Failed to fetch snippet</span>`;
+        }
+      }, 400); // 400ms debounce
     }
+
+    document.getElementById('copyCodeBtn').addEventListener('click', async () => {
+      if (!currentSnippetString) return;
+      try {
+        await navigator.clipboard.writeText(currentSnippetString);
+        showToast('Code copied to clipboard!');
+      } catch (err) {
+        showToast('<span style="color:#f87171">Failed to copy</span>');
+      }
+    });
 
     // ── Size slider ───────────────────────────────────────
     sizeInput.addEventListener('input', () => {
@@ -1150,6 +1268,21 @@
       updateCodeSnippet();
     });
 
+    document.querySelectorAll('.segment-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const type = btn.dataset.type;
+        const val = btn.dataset.val;
+        
+        btn.parentElement.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        if (type === 'lang') currentLang = val;
+        if (type === 'style') currentStyle = val;
+
+        updateCodeSnippet();
+      });
+    });
+
     document.querySelectorAll('.color-preset-swatch').forEach(btn => {
       btn.addEventListener('click', () => {
         isCurrentColor = false;
@@ -1170,10 +1303,7 @@
         activeBg = btn.dataset.bg;
         modalPreview.className = 'modal-preview';
         if (activeBg !== 'dark') modalPreview.classList.add(`bg-${activeBg}`);
-        // Flip preview text color for light background
-        if (activeBg === 'light' && !isCurrentColor) {
-          // keep chosen color, no change needed
-        }
+        applyColorToPreview(); // Fix currentColor contrast update on bg change
       });
     });
 
@@ -1186,7 +1316,9 @@
     document.getElementById('saveComponentBtn').addEventListener('click', async () => {
       const customizations = {
         size:  Number(sizeInput.value),
-        color: isCurrentColor ? 'currentColor' : colorHex.value
+        color: isCurrentColor ? 'currentColor' : colorHex.value,
+        language: currentLang,
+        exportStyle: currentStyle
       };
 
       const saveBtn = document.getElementById('saveComponentBtn');
@@ -1213,6 +1345,56 @@
       } finally {
         saveBtn.innerHTML = original;
         saveBtn.disabled  = false;
+      }
+    });
+
+    document.getElementById('downloadSvgBtn').addEventListener('click', () => {
+      const svg = modalPreview.querySelector('svg');
+      if (!svg) return;
+
+      const clone = svg.cloneNode(true);
+      
+      // Inject color explicitly for external viewers
+      const finalColor = isCurrentColor ? 'currentColor' : colorHex.value;
+      clone.setAttribute('color', finalColor);
+      
+      const serializer = new XMLSerializer();
+      let source = serializer.serializeToString(clone);
+
+      if(!source.match(/^<\?xml[^>]+>/)){
+          source = '<?xml version="1.0" encoding="utf-8"?>\n' + source;
+      }
+
+      const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${currentName}.svg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      URL.revokeObjectURL(url);
+      showToast('SVG Downloaded!');
+    });
+
+    document.getElementById('copySvgBtn').addEventListener('click', async () => {
+      const svg = modalPreview.querySelector('svg');
+      if (!svg) return;
+      
+      const clone = svg.cloneNode(true);
+      const finalColor = isCurrentColor ? 'currentColor' : colorHex.value;
+      clone.setAttribute('color', finalColor);
+      
+      const serializer = new XMLSerializer();
+      const source = serializer.serializeToString(clone);
+      
+      try {
+        await navigator.clipboard.writeText(source);
+        showToast('Raw SVG copied to clipboard!');
+      } catch (err) {
+        showToast('<span style="color:#f87171">Failed to copy</span>');
       }
     });
 

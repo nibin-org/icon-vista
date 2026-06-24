@@ -44,31 +44,33 @@ if (args[0] === 'init') {
   // Serve public folder
   app.use(express.static(path.join(projectRoot, 'public')));
 
+  async function fetchAndGenerateCode(icon_id, customizations) {
+    if (!icon_id) throw new Error('icon_id is required');
+
+    const [prefix, name] = icon_id.split(':');
+    
+    const response = await fetch(`https://api.iconify.design/${prefix}/${name}.svg`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch icon: ${response.statusText}`);
+    }
+
+    const svgContent = await response.text();
+    
+    const baseName = name.replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase())
+                        .replace(/^([a-z])/, (m, chr) => chr.toUpperCase());
+    const iconName = `${baseName}Icon`;
+    const ext = customizations.language === 'js' ? 'jsx' : 'tsx';
+    const fileName = `${iconName}.${ext}`;
+
+    const componentCode = generateReactIcon(iconName, svgContent, customizations || {});
+
+    return { componentCode, fileName };
+  }
+
   app.post('/api/download', async (req, res) => {
     try {
       const { icon_id, customizations } = req.body;
-      if (!icon_id) {
-        return res.status(400).json({ error: 'icon_id is required' });
-      }
-
-      // icon_id is typically prefix:name
-      const [prefix, name] = icon_id.split(':');
-      
-      const response = await fetch(`https://api.iconify.design/${prefix}/${name}.svg`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch icon: ${response.statusText}`);
-      }
-
-      const svgContent = await response.text();
-      
-      // Clean icon name 
-      // e.g., shopping-cart -> ShoppingCartIcon
-      const baseName = name.replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase())
-                          .replace(/^([a-z])/, (m, chr) => chr.toUpperCase());
-      const iconName = `${baseName}Icon`;
-      const fileName = `${iconName}.tsx`;
-
-      const componentCode = generateReactIcon(iconName, svgContent, customizations || {});
+      const { componentCode, fileName } = await fetchAndGenerateCode(icon_id, customizations);
 
       if (!fs.existsSync(savePath)) {
         fs.mkdirSync(savePath, { recursive: true });
@@ -78,6 +80,18 @@ if (args[0] === 'init') {
       fs.writeFileSync(filePath, componentCode, 'utf-8');
 
       res.json({ success: true, message: `Saved ${fileName}`, fileName, filePath });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post('/api/generate-snippet', async (req, res) => {
+    try {
+      const { icon_id, customizations } = req.body;
+      const { componentCode } = await fetchAndGenerateCode(icon_id, customizations);
+
+      res.json({ success: true, code: componentCode });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: err.message });

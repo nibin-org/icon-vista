@@ -3,8 +3,8 @@ export function generateReactIcon(iconName, svgContent, customizations = {}) {
   const defaultColor = customizations.color || "currentColor";
 
   let reactSvg = svgContent
-    .replace(/\bwidth="[^"]*"/g, "")
-    .replace(/\bheight="[^"]*"/g, "")
+    .replace(/\s*\bwidth="[^"]*"/g, "")
+    .replace(/\s*\bheight="[^"]*"/g, "")
     .replace(/stroke-width/g, "strokeWidth")
     .replace(/stroke-linecap/g, "strokeLinecap")
     .replace(/stroke-linejoin/g, "strokeLinejoin")
@@ -32,7 +32,11 @@ export function generateReactIcon(iconName, svgContent, customizations = {}) {
   // Instead, we let the SVG retain "currentColor" so it naturally cascades from the React `color` prop.
 
   // Inject width, height, color, and {...props} into the opening <svg> tag
-  reactSvg = reactSvg.replace(/<svg([^>]*)>/, '<svg$1 width={width} height={height} color={color} {...props}>');
+  reactSvg = reactSvg.replace(/<svg([^>]*)>/, (match, p1) => {
+    const cleanedAttrs = p1.replace(/\s+/g, ' ').trim();
+    const prefix = cleanedAttrs ? ` ${cleanedAttrs}` : '';
+    return `<svg${prefix} width={width} height={height} color={color} {...props}>`;
+  });
 
   // Format SVG with proper indentation
   let formattedSvg = reactSvg.replace(/>\s*</g, '>\n<');
@@ -52,17 +56,32 @@ export function generateReactIcon(iconName, svgContent, customizations = {}) {
   const formattedSize = isNaN(defaultSize) ? `"${defaultSize}"` : defaultSize;
   const formattedColor = `"${defaultColor}"`;
 
-  return `import * as React from "react";
+  const isTS = customizations.language !== 'js'; // Defaults to TS
+  const isArrow = customizations.exportStyle === 'arrow';
 
-export function ${iconName}({
+  const propsType = isTS ? `: React.SVGProps<SVGSVGElement>` : ``;
+  const propsString = `{
   width = ${formattedSize},
   height = ${formattedSize},
   color = ${formattedColor},
   ...props
-}: React.SVGProps<SVGSVGElement>) {
+}${propsType}`;
+
+  let componentCode = '';
+
+  if (isArrow) {
+    componentCode = `export const ${iconName} = (${propsString}) => {
   return (
 ${formattedSvg}
   );
-}
-`;
+};`;
+  } else {
+    componentCode = `export function ${iconName}(${propsString}) {
+  return (
+${formattedSvg}
+  );
+}`;
+  }
+
+  return `import * as React from "react";\n\n${componentCode}\n`;
 }
