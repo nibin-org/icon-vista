@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-06-25
+### Added
+- **Modern Color Picker**: Integrated the Pickr library for a smoother, cross-browser consistent color selection experience.
+- **Recent Colors**: Added support for saving and displaying the 5 most recently used colors. Your selections are now persisted across sessions.
+- **Hex Input Enhancements**: The color hex input now automatically formats and correctly expands 3-digit hex codes (e.g., `#abc` expands to `#aabbcc`).
+
+### Changed
+- **Inherit Mode**: Replaced the previous `currentColor` button with a new "Inherit" switch to improve UI clarity.
+- **Startup Behavior**: The application now loads a random theme upon initialization instead of a static search.
+- **Dynamic Swatches**: Refactored the color swatches section to dynamically render your recent colors alongside standard presets.
+- **Slider UI**: Improved the size slider with dynamic fill tracking as the value changes.
+
 ## [1.0.1] - 2026-06-24
 ### Fixed
 - Fixed a strict TypeScript compilation error (`TS17001`) where generated SVG components were rendering duplicate `color` attributes when parsing premium SVGs that natively hardcoded `color="currentColor"`. The generator now aggressively strips existing color properties before injecting React props.
