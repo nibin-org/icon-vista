@@ -2,9 +2,35 @@ import { Navbar } from "@/components/Navbar";
 
 const releases = [
   {
-    version: "1.1.2",
+    version: "1.1.3",
     date: "June 26, 2026",
     latest: true,
+    added: [
+      {
+        title: "Unit Testing Suite",
+        desc: "Implemented a comprehensive Vitest testing suite covering the React component generator to ensure strictly typed, 100% valid React output.",
+      },
+      {
+        title: "Automated CI/CD Tests",
+        desc: "The GitHub Actions release pipeline now strictly enforces npm test before any tag or npm publish occurs.",
+      },
+      {
+        title: "Website Link",
+        desc: "Added a direct link to the full documentation website in the README.md.",
+      },
+    ],
+    changed: [],
+    fixed: [
+      {
+        title: "Regex Edge Case",
+        desc: "Fixed a critical generator bug where width and height attributes were being globally stripped from all inner SVG tags (e.g. <rect width=\"24\">), which was distorting certain icons. The generator now strictly targets only the outer <svg> wrapper.",
+      },
+    ],
+  },
+  {
+    version: "1.1.2",
+    date: "June 26, 2026",
+    latest: false,
     added: [
       {
         title: "Infinite Scrolling",

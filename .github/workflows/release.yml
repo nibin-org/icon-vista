@@ -57,7 +57,14 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
-      # 6. Create the git tag
+      # 6. Install dependencies and run tests
+      - name: Run Tests
+        if: steps.tag_check.outputs.exists == 'false'
+        run: |
+          npm ci
+          npm test
+
+      # 7. Create the git tag
       - name: Create git tag
         if: steps.tag_check.outputs.exists == 'false'
         run: |
@@ -66,7 +73,7 @@ jobs:
           git tag "v${{ steps.pkg.outputs.version }}"
           git push origin "v${{ steps.pkg.outputs.version }}"
 
-      # 7. Create a GitHub Release with the extracted changelog notes
+      # 8. Create a GitHub Release with the extracted changelog notes
       - name: Create GitHub Release
         if: steps.tag_check.outputs.exists == 'false'
         env:
@@ -76,7 +83,7 @@ jobs:
             --title "v${{ steps.pkg.outputs.version }}" \
             --notes-file /tmp/release_notes.md
 
-      # 8. Publish to npm
+      # 9. Publish to npm
       - name: Publish to npm
         if: steps.tag_check.outputs.exists == 'false'
         run: npm publish --access public

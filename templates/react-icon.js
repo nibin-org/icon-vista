@@ -3,9 +3,6 @@ export function generateReactIcon(iconName, svgContent, customizations = {}) {
   const defaultColor = customizations.color || "currentColor";
 
   let reactSvg = svgContent
-    .replace(/\s*\bwidth="[^"]*"/g, "")
-    .replace(/\s*\bheight="[^"]*"/g, "")
-    .replace(/\s*\bcolor="[^"]*"/g, "")
     .replace(/stroke-width/g, "strokeWidth")
     .replace(/stroke-linecap/g, "strokeLinecap")
     .replace(/stroke-linejoin/g, "strokeLinejoin")
@@ -34,7 +31,12 @@ export function generateReactIcon(iconName, svgContent, customizations = {}) {
 
   // Inject width, height, color, and {...props} into the opening <svg> tag
   reactSvg = reactSvg.replace(/<svg([^>]*)>/, (match, p1) => {
-    const cleanedAttrs = p1.replace(/\s+/g, ' ').trim();
+    const cleanedAttrs = p1
+      .replace(/\s*\bwidth="[^"]*"/g, "")
+      .replace(/\s*\bheight="[^"]*"/g, "")
+      .replace(/\s*\bcolor="[^"]*"/g, "")
+      .replace(/\s+/g, ' ')
+      .trim();
     const prefix = cleanedAttrs ? ` ${cleanedAttrs}` : '';
     return `<svg${prefix} width={width} height={height} color={color} {...props}>`;
   });

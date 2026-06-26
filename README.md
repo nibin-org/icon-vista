@@ -8,6 +8,9 @@ A beautiful, local CLI tool to search, generate, and strictly type React icons d
 * **Enterprise Provider Architecture**: Decoupled backend supports both public APIs (Iconify) and reverse-rendering of private premium packages.
 * **No Dependencies**: Generates pure, raw `<svg>` React components that require no external runtime dependencies.
 
+> 📚 **[Read the Full Documentation](https://icon-vista.vercel.app)**  
+> *(Note: Replace with your actual deployed URL)*
+
 ---
 
 ## 🚀 Quick Start (Free Iconify Provider)
