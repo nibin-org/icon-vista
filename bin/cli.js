@@ -164,7 +164,8 @@ if (args[0] === 'init') {
   function startServer(port) {
     const server = app.listen(port, () => {
       console.log(`\n🚀 icon-vista is running at http://localhost:${port}`);
-      console.log(`Saving icons to: ${config.savePath}\n`);
+      console.log(`📂 Saving icons to: ${config.savePath}`);
+      console.log(`📚 Documentation: https://icon-vista.vercel.app\n`);
       
       const url = `http://localhost:${port}`;
       const startCmd = process.platform === 'win32' ? 'start' : process.platform === 'darwin' ? 'open' : 'xdg-open';

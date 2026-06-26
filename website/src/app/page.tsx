@@ -137,6 +137,20 @@ export default function Home() {
           </div>
 
           <p className="text-xs text-slate-600">No global install required. No signup. Runs entirely on localhost.</p>
+          
+          {/* Video Demo */}
+          <div className="mt-16 mx-auto max-w-4xl rounded-xl overflow-hidden border border-white/10 shadow-2xl shadow-brand-purple/20 relative group bg-black">
+            <video 
+              autoPlay 
+              loop 
+              muted 
+              playsInline 
+              controls
+              className="w-full h-auto block"
+            >
+              <source src="/demo.webm" type="video/webm" />
+            </video>
+          </div>
         </section>
 
         {/* ── HOW IT WORKS ── */}

@@ -2,9 +2,26 @@ import { Navbar } from "@/components/Navbar";
 
 const releases = [
   {
-    version: "1.1.3",
+    version: "1.1.4",
     date: "June 26, 2026",
     latest: true,
+    added: [
+      {
+        title: "Interactive Demo",
+        desc: "Added a looping video demonstration of the CLI to the README and website.",
+      },
+      {
+        title: "Documentation Links",
+        desc: "Added direct links to the new Next.js documentation website within the CLI terminal output and the local UI.",
+      },
+    ],
+    changed: [],
+    fixed: [],
+  },
+  {
+    version: "1.1.3",
+    date: "June 26, 2026",
+    latest: false,
     added: [
       {
         title: "Unit Testing Suite",

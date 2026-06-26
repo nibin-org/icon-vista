@@ -2,6 +2,10 @@
 
 A beautiful, local CLI tool to search, generate, and strictly type React icons directly into your codebase. By default, it searches across 200,000+ open-source icons via Iconify. It also features a built-in enterprise plugin to seamlessly integrate premium private icon libraries like **Untitled UI Pro**.
 
+<br />
+<video src="https://icon-vista.vercel.app/demo.webm" width="100%" controls autoPlay loop muted playsInline></video>
+<br />
+
 ## ✨ Features
 * **Visual Search Engine**: Instantly search thousands of icons via a beautiful local UI.
 * **Code Generation**: One-click generation of fully typed React components (TS/JS, Arrow/Standard functions).
