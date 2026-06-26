@@ -2,9 +2,26 @@ import { Navbar } from "@/components/Navbar";
 
 const releases = [
   {
-    version: "1.1.4",
+    version: "1.1.5",
     date: "June 26, 2026",
     latest: true,
+    added: [],
+    changed: [],
+    fixed: [
+      {
+        title: "NPM Markdown Compatibility",
+        desc: "Replaced the <video> tag in the README with a clean text link pointing to the Next.js site, as the NPM registry strictly strips out HTML video elements, leaving a broken layout. Removed leftover placeholder text.",
+      },
+      {
+        title: "Cropped Video",
+        desc: "Updated the demo video to a tightly cropped, high-resolution version.",
+      },
+    ],
+  },
+  {
+    version: "1.1.4",
+    date: "June 26, 2026",
+    latest: false,
     added: [
       {
         title: "Interactive Demo",
