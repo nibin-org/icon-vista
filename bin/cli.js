@@ -17,6 +17,16 @@ const CONFIG_FILE = path.join(cwd, 'icon-vista.json');
 
 const args = process.argv.slice(2);
 
+let isHeadless = false;
+let startPort = 3000;
+
+for (let i = 0; i < args.length; i++) {
+  if (args[i] === '--headless') isHeadless = true;
+  if (args[i] === '--port' || args[i] === '-p') {
+    startPort = parseInt(args[i+1], 10) || 3000;
+  }
+}
+
 if (args[0] === 'init') {
   const rl = readline.createInterface({
     input: process.stdin,
@@ -73,7 +83,7 @@ if (args[0] === 'init') {
     const ext = customizations.language === 'js' ? 'jsx' : 'tsx';
     const fileName = `${iconName}.${ext}`;
 
-    const componentCode = generateReactIcon(iconName, svgContent, customizations || {});
+    const componentCode = await generateReactIcon(iconName, svgContent, customizations || {});
 
     return { componentCode, fileName };
   }
@@ -167,11 +177,13 @@ if (args[0] === 'init') {
       console.log(`📂 Saving icons to: ${config.savePath}`);
       console.log(`📚 Documentation: https://icon-vista.vercel.app\n`);
       
-      const url = `http://localhost:${port}`;
-      const startCmd = process.platform === 'win32' ? 'start' : process.platform === 'darwin' ? 'open' : 'xdg-open';
-      exec(`${startCmd} ${url}`).on('error', () => {
-         console.log(`Failed to open browser automatically. Please visit ${url}`);
-      });
+      if (!isHeadless) {
+        const url = `http://localhost:${port}`;
+        const startCmd = process.platform === 'win32' ? 'start' : process.platform === 'darwin' ? 'open' : 'xdg-open';
+        exec(`${startCmd} ${url}`).on('error', () => {
+           console.log(`Failed to open browser automatically. Please visit ${url}`);
+        });
+      }
     });
 
     server.on('error', (err) => {
@@ -183,5 +195,5 @@ if (args[0] === 'init') {
     });
   }
 
-  startServer(3000);
+  startServer(startPort);
 }

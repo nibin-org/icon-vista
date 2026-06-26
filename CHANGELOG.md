@@ -4,8 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.2.0] - 2026-06-26
+### Added
+- **SVGR AST Parsing**: Completely rewrote the React component generator to use `@svgr/core` instead of fragile regex string manipulation, guaranteeing 100% syntactically correct JSX AST generation.
+- **CLI Arguments**: Added `--headless` mode for CI/CD usage and `--port <port>` (or `-p`) for custom port binding to avoid collisions.
+- **Preference Persistence**: UI selections for Language (TS/JS) and Export Style (Arrow/Function) are now automatically persisted across sessions using `localStorage`.
 
-## [1.1.3] - 2026-06-26
+### Changed
+- **Frontend Architecture**: Refactored the monolithic 2,300-line `index.html` file by extracting logic into `app.js` and styles into `styles.css` for dramatically improved maintainability.
+
+## [1.1.5] - 2026-06-26
 ### Added
 - **Unit Testing Suite**: Implemented a comprehensive Vitest testing suite covering the React component generator to ensure strictly typed, 100% valid React output.
 - **Automated CI/CD Tests**: The GitHub Actions release pipeline now strictly enforces `npm test` before any tag or npm publish occurs.

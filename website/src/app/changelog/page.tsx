@@ -2,9 +2,35 @@ import { Navbar } from "@/components/Navbar";
 
 const releases = [
   {
-    version: "1.1.5",
+    version: "1.2.0",
     date: "June 26, 2026",
     latest: true,
+    added: [
+      {
+        title: "AST-based SVG Parsing",
+        desc: "Replaced the fragile regex generator with @svgr/core, ensuring 100% syntactically correct React JSX output directly from SVG abstract syntax trees.",
+      },
+      {
+        title: "CLI Arguments",
+        desc: "Introduced --headless mode for CI/CD and --port <number> flag for custom port binding to avoid EADDRINUSE collisions.",
+      },
+      {
+        title: "Persisted Preferences",
+        desc: "The dashboard now remembers your preferred Language (TypeScript/JavaScript) and Component Style (Arrow/Function) across sessions.",
+      },
+    ],
+    changed: [
+      {
+        title: "Modularized Architecture",
+        desc: "Split the monolithic 2,300-line index.html into a clean app.js and styles.css structure for improved maintainability.",
+      },
+    ],
+    fixed: [],
+  },
+  {
+    version: "1.1.5",
+    date: "June 26, 2026",
+    latest: false,
     added: [],
     changed: [],
     fixed: [

@@ -4,8 +4,8 @@ import { generateReactIcon } from '../templates/react-icon.js';
 describe('React Component Generator', () => {
   const sampleSvg = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>`;
 
-  it('should generate a TypeScript function by default', () => {
-    const result = generateReactIcon('ActivityIcon', sampleSvg);
+  it('should generate a TypeScript function by default', async () => {
+    const result = await generateReactIcon('ActivityIcon', sampleSvg);
     
     // Check TS typings
     expect(result).toContain('React.SVGProps<SVGSVGElement>');
@@ -15,13 +15,13 @@ describe('React Component Generator', () => {
     expect(result).toContain('width = 24');
     expect(result).toContain('color = "currentColor"');
     // Check camelCasing
-    expect(result).toContain('strokeWidth="2"');
+    expect(result).toContain('strokeWidth={2}');
     expect(result).toContain('strokeLinecap="round"');
     expect(result).toContain('className="feather feather-activity"');
   });
 
-  it('should strip hardcoded width and height from the original SVG', () => {
-    const result = generateReactIcon('ActivityIcon', sampleSvg);
+  it('should strip hardcoded width and height from the original SVG', async () => {
+    const result = await generateReactIcon('ActivityIcon', sampleSvg);
     
     // The `<svg ... width={width} height={height}` is injected, 
     // but the original `width="24" height="24"` from the raw SVG should be gone.
@@ -32,8 +32,8 @@ describe('React Component Generator', () => {
     expect(openingTag).toContain('height={height}');
   });
 
-  it('should generate a JavaScript arrow function when specified', () => {
-    const result = generateReactIcon('ActivityIcon', sampleSvg, {
+  it('should generate a JavaScript arrow function when specified', async () => {
+    const result = await generateReactIcon('ActivityIcon', sampleSvg, {
       language: 'js',
       exportStyle: 'arrow'
     });
@@ -41,12 +41,12 @@ describe('React Component Generator', () => {
     // No TS typings
     expect(result).not.toContain('React.SVGProps');
     // Arrow function format
-    expect(result).toContain('export const ActivityIcon = (');
+    expect(result).toContain('export const ActivityIcon = ({');
   });
 
-  it('should apply custom colors and sizes properly', () => {
+  it('should apply custom colors and sizes properly', async () => {
     const coloredSvg = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" color="#FF0000"><path d="M0 0h24v24H0z"/></svg>`;
-    const result = generateReactIcon('CustomIcon', coloredSvg, {
+    const result = await generateReactIcon('CustomIcon', coloredSvg, {
       size: 32,
       color: '#06b6d4'
     });
@@ -60,8 +60,8 @@ describe('React Component Generator', () => {
     expect(result).not.toContain('color="#FF0000"');
   });
 
-  it('should preserve currentColor in paths/strokes so it cascades', () => {
-    const result = generateReactIcon('ActivityIcon', sampleSvg, {
+  it('should preserve currentColor in paths/strokes so it cascades', async () => {
+    const result = await generateReactIcon('ActivityIcon', sampleSvg, {
       color: '#7c3aed'
     });
     
