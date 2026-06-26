@@ -109,11 +109,31 @@ if (args[0] === 'init') {
     }
   });
 
+  app.get('/api/filters', async (req, res) => {
+    try {
+      if (typeof activeProvider.getFilters === 'function') {
+        const filters = await activeProvider.getFilters();
+        res.json(filters);
+      } else {
+        res.json({ packs: [], styles: [] });
+      }
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   app.get('/api/search', async (req, res) => {
     try {
       const q = req.query.query || '';
       const limit = parseInt(req.query.limit) || 100;
-      const icons = await activeProvider.search(q, limit);
+      const start = parseInt(req.query.start) || 0;
+      
+      const options = {
+        packs: req.query.packs ? req.query.packs.split(',').filter(Boolean) : [],
+        styles: req.query.styles ? req.query.styles.split(',').filter(Boolean) : []
+      };
+
+      const icons = await activeProvider.search(q, limit, options, start);
       res.json({ icons });
     } catch (err) {
       res.status(500).json({ error: err.message });

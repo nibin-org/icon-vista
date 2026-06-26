@@ -4,17 +4,83 @@ import { createRequire } from 'module';
 export class IconifyProvider {
   constructor() {
     this.name = 'iconify';
+    this.cachedFilters = null;
   }
 
   async init() {
     // Iconify requires no initialization
   }
 
-  async search(query, limit = 100) {
-    const res = await fetch(`https://api.iconify.design/search?query=${encodeURIComponent(query)}&limit=${limit}`);
-    if (!res.ok) throw new Error('Iconify search failed');
-    const data = await res.json();
-    return data.icons || [];
+  async getFilters() {
+    if (this.cachedFilters) return this.cachedFilters;
+    try {
+      const res = await fetch('https://api.iconify.design/collections');
+      const data = await res.json();
+      
+      // Curated whitelist of the highest quality / most popular packs
+      const whitelist = [
+        'mdi', 'ph', 'lucide', 'heroicons', 'bi', 'tabler', 
+        'radix-icons', 'feather', 'ri', 'carbon', 'ion'
+      ];
+
+      const packs = Object.keys(data)
+        .filter(key => whitelist.includes(key))
+        .map(key => ({
+          id: key,
+          name: data[key].name || key
+        }));
+        
+      // Sort alphabetically
+      packs.sort((a, b) => a.name.localeCompare(b.name));
+      this.cachedFilters = {
+        packs,
+        styles: ['line', 'solid', 'duotone']
+      };
+      return this.cachedFilters;
+    } catch (e) {
+      return { packs: [], styles: [] };
+    }
+  }
+
+  async search(query, limit = 100, options = {}, start = 0) {
+    let finalQuery = query.trim();
+    let searchPromises = [];
+    
+    let fetchLimit = start + limit;
+    if (fetchLimit > 999) fetchLimit = 999;
+    
+    let urlBase = `https://api.iconify.design/search?limit=${fetchLimit}`;
+    if (options.packs && options.packs.length > 0) {
+      urlBase += `&prefixes=${options.packs.join(',')}`;
+    }
+    
+    if (options.styles && options.styles.length > 0) {
+      let mappedStyles = [];
+      options.styles.forEach(s => {
+        if (s === 'solid') mappedStyles.push('solid', 'fill');
+        else if (s === 'line') mappedStyles.push('line', 'outline');
+        else mappedStyles.push(s);
+      });
+      
+      for (const style of mappedStyles) {
+        const fetchUrl = `${urlBase}&query=${encodeURIComponent((finalQuery + ' ' + style).trim())}`;
+        searchPromises.push(fetch(fetchUrl).then(r => r.ok ? r.json() : {icons:[]}));
+      }
+    } else {
+      const fetchUrl = `${urlBase}&query=${encodeURIComponent(finalQuery)}`;
+      searchPromises.push(fetch(fetchUrl).then(r => r.ok ? r.json() : {icons:[]}));
+    }
+    
+    const results = await Promise.all(searchPromises);
+    const mergedIcons = new Set();
+    
+    results.forEach(data => {
+      if (data.icons) {
+        data.icons.forEach(i => mergedIcons.add(i));
+      }
+    });
+    
+    return Array.from(mergedIcons).slice(start, start + limit);
   }
 
   async getSvg(iconId) {
@@ -31,6 +97,7 @@ export class UntitledUIProvider {
     this.iconList = [];
     this.iconCache = {};
     this.initialized = false;
+    this.availableCategories = [];
   }
 
   async init() {
@@ -53,7 +120,9 @@ export class UntitledUIProvider {
       try { categories.duotone = userRequire('@untitledui-pro/icons/duotone'); } catch(e) {}
       try { categories.duocolor = userRequire('@untitledui-pro/icons/duocolor'); } catch(e) {}
       
-      if (Object.keys(categories).length === 0) {
+      this.availableCategories = Object.keys(categories);
+      
+      if (this.availableCategories.length === 0) {
         throw new Error("No Untitled UI icon modules found.");
       }
     } catch (err) {
@@ -99,13 +168,25 @@ export class UntitledUIProvider {
     console.log(`✅ Successfully indexed ${count} premium Untitled UI icons.`);
   }
 
-  async search(query, limit = 100) {
-    const q = query.toLowerCase();
-    if (!q) {
-      return this.iconList.slice(0, limit).map(r => r.id);
+  async getFilters() {
+    return {
+      packs: [{ id: 'untitledui', name: 'Untitled UI Pro' }],
+      styles: this.availableCategories
+    };
+  }
+
+  async search(query, limit = 100, options = {}, start = 0) {
+    let results = this.iconList;
+    
+    if (options.styles && options.styles.length > 0) {
+      results = results.filter(icon => options.styles.includes(icon.category));
     }
-    const results = this.iconList.filter(icon => icon.searchString.includes(q)).slice(0, limit);
-    return results.map(r => r.id);
+    
+    const q = query ? query.toLowerCase() : '';
+    if (q) {
+      results = results.filter(icon => icon.searchString.includes(q));
+    }
+    return results.slice(start, start + limit).map(r => r.id);
   }
 
   async getSvg(iconId) {
